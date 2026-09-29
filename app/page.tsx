@@ -230,7 +230,7 @@ export default function Home() {
       </aside>
 
       <section className="workspace" id="today">
-        <header className="topbar"><span className="breadcrumb">Your space <span>/</span> <strong>My todos</strong></span><div className="top-actions"><span className={`sync-badge ${supabase ? "connected" : "local"}`}><span />{supabase ? "Supabase connected" : "Saved on this device"}</span><button className="icon-button" aria-label="Search todos" onClick={() => document.getElementById("task-search")?.focus()}><Icon name="search" /></button><button className="icon-button notification-button" aria-label="Notifications"><Icon name="bell" /><span /></button></div></header>
+        <header className="topbar"><span className="breadcrumb">Your space <span>/</span> <strong>My todos</strong></span><div className="top-actions"><button className="icon-button" aria-label="Search todos" onClick={() => document.getElementById("task-search")?.focus()}><Icon name="search" /></button><button className="icon-button notification-button" aria-label="Notifications"><Icon name="bell" /><span /></button></div></header>
 
         <div className="content">
           <section className="welcome-row"><div><div className="eyebrow"><span className="eyebrow-line" />{today.toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric" })}</div><h1>A little progress,<br className="mobile-break" /> <span>every day.</span></h1><p className="welcome-copy">You&apos;ve got this. Let&apos;s see what&apos;s on your mind.</p></div><div className="today-stamp"><span className="stamp-day">{today.toLocaleDateString("en", { day: "2-digit" })}</span><span className="stamp-month">{today.toLocaleDateString("en", { month: "short" }).toUpperCase()}</span></div></section>
