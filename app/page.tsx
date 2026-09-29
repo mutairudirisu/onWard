@@ -40,7 +40,7 @@ function formatDate(date: string) {
   return new Date(`${date}T12:00:00`).toLocaleDateString("en", { month: "short", day: "numeric" });
 }
 
-function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "search" | "bell" | "plus" | "grip" | "check" | "close"; size?: number }) {
+function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "search" | "bell" | "plus" | "grip" | "check" | "close" | "trash"; size?: number }) {
   const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
   const paths = {
     spark: <><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z" /><path d="m19 14 .9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14Z" /></>,
@@ -52,6 +52,7 @@ function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "s
     grip: <><circle cx="9" cy="6" r=".8" /><circle cx="15" cy="6" r=".8" /><circle cx="9" cy="12" r=".8" /><circle cx="15" cy="12" r=".8" /><circle cx="9" cy="18" r=".8" /><circle cx="15" cy="18" r=".8" /></>,
     check: <path d="m5 12 4 4L19 6" />,
     close: <><path d="m18 6-12 12M6 6l12 12" /></>,
+    trash: <><path d="M4 7h16" /><path d="M10 11v6M14 11v6" /><path d="m5 7 1 13h12l1-13M9 7V4h6v3" /></>,
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
@@ -63,6 +64,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showCompleted, setShowCompleted] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -115,6 +117,19 @@ export default function Home() {
     const form = new FormData(event.currentTarget);
     const title = String(form.get("title") ?? "").trim();
     if (!title) return;
+    if (editingTask) {
+      const updated: Task = {
+        ...editingTask,
+        title,
+        category: String(form.get("category") ?? editingTask.category),
+        due_date: String(form.get("due_date") ?? editingTask.due_date),
+      };
+      setTasks((current) => current.map((task) => task.id === updated.id ? updated : task));
+      await saveTask(updated);
+      setAdding(false);
+      setEditingTask(null);
+      return;
+    }
     const task: Task = {
       id: crypto.randomUUID(),
       title,
@@ -126,6 +141,34 @@ export default function Home() {
     setTasks((current) => [...current, task]);
     await saveTask(task);
     setAdding(false);
+  }
+
+  function openAddTodo() {
+    setEditingTask(null);
+    setAdding(true);
+  }
+
+  function openEditTodo(task: Task) {
+    setEditingTask(task);
+    setAdding(true);
+  }
+
+  function closeTodoDialog() {
+    setAdding(false);
+    setEditingTask(null);
+  }
+
+  async function deleteTodo(task: Task) {
+    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
+    const previousTasks = tasks;
+    setTasks((current) => current.filter((item) => item.id !== task.id));
+    if (supabase) {
+      const { error: deleteError } = await supabase.from("todos").delete().eq("id", task.id);
+      if (deleteError) {
+        setTasks(previousTasks);
+        setError("Could not delete that todo from Supabase. Please try again.");
+      }
+    }
   }
 
   async function toggleTask(task: Task) {
@@ -195,29 +238,29 @@ export default function Home() {
           <section className="summary-strip" aria-label="Todo progress"><div className="summary-count"><span className="summary-number">{openCount}</span><span>still to do</span></div><div className="summary-divider" /><div className="summary-progress"><div className="progress-copy"><span>Today&apos;s momentum</span><span>{tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0}%</span></div><div className="progress-track"><span style={{ width: `${tasks.length ? (doneCount / tasks.length) * 100 : 0}%` }} /></div></div><span className="summary-flower">✳</span></section>
 
           <section className="tasks-section">
-            <div className="section-heading"><div><span className="section-kicker">YOUR LIST</span><h2>Todos <span className="task-total">{tasks.length}</span></h2></div><div className="list-actions"><label className="search-box"><Icon name="search" size={16} /><input id="task-search" placeholder="Find a todo" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></label><button className="add-todo-button" onClick={() => setAdding(true)}><Icon name="plus" size={16} /><span>Add a Todo</span></button><button className="filter-button" onClick={() => setShowCompleted((visible) => !visible)} aria-label={showCompleted ? "Hide completed todos" : "Show completed todos"} aria-pressed={!showCompleted}><Icon name="check" size={15} /><span>{showCompleted ? "All todos" : "Hide completed"}</span></button></div></div>
+            <div className="section-heading"><div><span className="section-kicker">YOUR LIST</span><h2>Todos <span className="task-total">{tasks.length}</span></h2></div><div className="list-actions"><label className="search-box"><Icon name="search" size={16} /><input id="task-search" placeholder="Find a todo" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></label><button className="add-todo-button" onClick={openAddTodo}><Icon name="plus" size={16} /><span>Add a Todo</span></button><button className="filter-button" onClick={() => setShowCompleted((visible) => !visible)} aria-label={showCompleted ? "Hide completed todos" : "Show completed todos"} aria-pressed={!showCompleted}><Icon name="check" size={15} /><span>{showCompleted ? "All todos" : "Hide completed"}</span></button></div></div>
 
             {error && <p className="error-banner" role="alert">{error} <button onClick={() => setError("")} aria-label="Dismiss error"><Icon name="close" size={15} /></button></p>}
 
             {!ready ? <div className="loading-list">Getting your day ready...</div> : (
               <div className="task-grid">
-                {visibleTasks.map((task) => <article key={task.id} className={`task-card ${colorByCategory[task.category] ?? "mint"} ${task.completed ? "is-complete" : ""} ${draggedId === task.id ? "is-dragging" : ""}`} draggable onDragStart={() => setDraggedId(task.id)} onDragEnd={() => setDraggedId(null)} onDragOver={(event) => event.preventDefault()} onDrop={() => void moveTask(task.id)}>
-                  <div className="card-top"><span className="category-dot" /> <span className="card-category">{task.category}</span><button className="drag-handle" aria-label="Drag to reorder"><Icon name="grip" size={19} /></button><button className="task-check" onClick={() => void toggleTask(task)} aria-label={task.completed ? "Mark as not done" : "Mark as done"} aria-pressed={task.completed}>{task.completed && <Icon name="check" size={16} />}</button></div>
+                {visibleTasks.map((task) => <article key={task.id} className={`task-card ${colorByCategory[task.category] ?? "mint"} ${task.completed ? "is-complete" : ""} ${draggedId === task.id ? "is-dragging" : ""}`} role="group" aria-label={`Todo: ${task.title}. Press Enter to edit.`} tabIndex={0} onClick={() => openEditTodo(task)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); openEditTodo(task); } }} onDragOver={(event) => event.preventDefault()} onDrop={() => void moveTask(task.id)}>
+                  <div className="card-top"><span className="category-dot" /> <span className="card-category">{task.category}</span><span className="card-actions"><button className="drag-handle" aria-label="Drag to reorder" title="Drag to reorder" draggable onDragStart={(event) => { event.stopPropagation(); event.dataTransfer.setData("text/plain", task.id); setDraggedId(task.id); }} onDragEnd={(event) => { event.stopPropagation(); setDraggedId(null); }} onClick={(event) => event.stopPropagation()}><Icon name="grip" size={19} /></button><button className="task-check" onClick={(event) => { event.stopPropagation(); void toggleTask(task); }} aria-label={task.completed ? "Mark as not done" : "Mark as done"} aria-pressed={task.completed}>{task.completed && <Icon name="check" size={16} />}</button><button className="delete-todo-button" onClick={(event) => { event.stopPropagation(); void deleteTodo(task); }} aria-label={`Delete ${task.title}`} title="Delete todo"><Icon name="trash" size={16} /></button></span></div>
                   <div className="card-middle"><p className="task-title">{task.title}</p><span className={`task-date ${task.due_date < localDate && !task.completed ? "overdue" : ""}`}>{formatDate(task.due_date)}{task.due_date < localDate && !task.completed ? " · gently overdue" : ""}</span></div>
-                  <div className="card-bottom"><span className="card-date-icon"><Icon name="calendar" size={13} /> {new Date(`${task.due_date}T12:00:00`).toLocaleDateString("en", { month: "short", day: "numeric" })}</span><span className="move-controls"><button onClick={() => void moveTaskByOffset(task.id, -1)} aria-label={`Move ${task.title} up`} title="Move up" disabled={tasks[0]?.id === task.id}>↑</button><button onClick={() => void moveTaskByOffset(task.id, 1)} aria-label={`Move ${task.title} down`} title="Move down" disabled={tasks[tasks.length - 1]?.id === task.id}>↓</button></span></div>
+                  <div className="card-bottom"><span className="card-date-icon"><Icon name="calendar" size={13} /> {new Date(`${task.due_date}T12:00:00`).toLocaleDateString("en", { month: "short", day: "numeric" })}</span><span className="move-controls"><button onClick={(event) => { event.stopPropagation(); void moveTaskByOffset(task.id, -1); }} aria-label={`Move ${task.title} up`} title="Move up" disabled={tasks[0]?.id === task.id}>↑</button><button onClick={(event) => { event.stopPropagation(); void moveTaskByOffset(task.id, 1); }} aria-label={`Move ${task.title} down`} title="Move down" disabled={tasks[tasks.length - 1]?.id === task.id}>↓</button></span></div>
                 </article>)}
-                <button className="add-card" onClick={() => setAdding(true)}><span className="add-card-icon"><Icon name="plus" size={20} /></span><span>Add a todo</span><span className="add-hint">Make some room for a new idea</span></button>
+                <button className="add-card" onClick={openAddTodo}><span className="add-card-icon"><Icon name="plus" size={20} /></span><span>Add a todo</span><span className="add-hint">Make some room for a new idea</span></button>
               </div>
             )}
-            {ready && visibleTasks.length === 0 && <div className="empty-state"><span>✳</span><p>Nothing on this list just yet.</p><button onClick={() => setAdding(true)}>Add your first todo</button></div>}
+            {ready && visibleTasks.length === 0 && <div className="empty-state"><span>✳</span><p>Nothing on this list just yet.</p><button onClick={openAddTodo}>Add your first todo</button></div>}
           </section>
 
           <footer className="page-footer"><span>One thing at a time.</span><span className="footer-flourish">— onWard</span></footer>
         </div>
-        <button className="mobile-add" onClick={() => setAdding(true)} aria-label="Add a todo"><Icon name="plus" size={23} /></button>
+        <button className="mobile-add" onClick={openAddTodo} aria-label="Add a todo"><Icon name="plus" size={23} /></button>
       </section>
 
-      {adding && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setAdding(false); }}><section className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-header"><div><span className="section-kicker">A FRESH START</span><h2 id="modal-title">Add a todo</h2></div><button className="icon-button" onClick={() => setAdding(false)} aria-label="Close"><Icon name="close" /></button></div><form className="flex flex-col" onSubmit={(event) => void addTask(event)}><label className="field-label" htmlFor="new-title">What&apos;s on your mind?</label><input id="new-title" className="form-input" name="title" placeholder="Write it down, get it out of your head..." autoFocus required maxLength={140} /><div className="form-row"><label className="form-field"><span className="field-label">A little list</span><select className="form-input" name="category" defaultValue="Personal"><option>Personal</option><option>Work</option><option>Errands</option><option>Ideas</option></select></label><label className="form-field"><span className="field-label">When-ish?</span><input className="form-input" name="due_date" type="date" defaultValue={localDate} required /></label></div><button className="submit-button" type="submit"><Icon name="plus" size={17} /> Add a todo</button></form></section></div>}
+      {adding && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeTodoDialog(); }}><section className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-header"><div><span className="section-kicker">{editingTask ? "A QUICK UPDATE" : "A FRESH START"}</span><h2 id="modal-title">{editingTask ? "Edit todo" : "Add a todo"}</h2></div><button className="icon-button" onClick={closeTodoDialog} aria-label="Close"><Icon name="close" /></button></div><form key={editingTask?.id ?? "new-todo"} className="flex flex-col" onSubmit={(event) => void addTask(event)}><label className="field-label" htmlFor="new-title">What&apos;s on your mind?</label><input id="new-title" className="form-input" name="title" placeholder="Write it down, get it out of your head..." defaultValue={editingTask?.title ?? ""} autoFocus required maxLength={140} /><div className="form-row"><label className="form-field"><span className="field-label">A little list</span><select className="form-input" name="category" defaultValue={editingTask?.category ?? "Personal"}><option>Personal</option><option>Work</option><option>Errands</option><option>Ideas</option></select></label><label className="form-field"><span className="field-label">When-ish?</span><input className="form-input" name="due_date" type="date" defaultValue={editingTask?.due_date ?? localDate} required /></label></div><button className="submit-button" type="submit"><Icon name={editingTask ? "check" : "plus"} size={17} />{editingTask ? "Save changes" : "Add a todo"}</button></form></section></div>}
     </main>
   );
 }
