@@ -19,12 +19,30 @@ const starterTasks: Task[] = [
   { id: "starter-4", title: "Book an appointment", category: "Errands", due_date: "2026-10-01", completed: true, position: 3 },
 ];
 
-const colorByCategory: Record<string, string> = {
-  Personal: "butter",
-  Work: "rose",
-  Errands: "sky",
-  Ideas: "mint",
-};
+const taskColumns = "id, title, category, due_date, completed, position";
+
+function sameTask(first: Task, second: Task) {
+  return first.id === second.id
+    && first.title === second.title
+    && first.category === second.category
+    && first.due_date === second.due_date
+    && first.completed === second.completed
+    && first.position === second.position;
+}
+
+const todoCategories = [
+  { name: "Personal", icon: "calendar", color: "butter" },
+  { name: "Work", icon: "archive", color: "rose" },
+  { name: "Errands", icon: "calendar", color: "sky" },
+  { name: "Ideas", icon: "spark", color: "mint" },
+  { name: "Home", icon: "calendar", color: "peach" },
+  { name: "Health", icon: "check", color: "teal" },
+  { name: "Learning", icon: "spark", color: "lime" },
+] as const;
+
+const colorByCategory = Object.fromEntries(
+  todoCategories.map(({ name, color }) => [name, color]),
+) as Record<string, string>;
 
 const today = new Date();
 const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60_000)
@@ -40,7 +58,7 @@ function formatDate(date: string) {
   return new Date(`${date}T12:00:00`).toLocaleDateString("en", { month: "short", day: "numeric" });
 }
 
-function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "search" | "bell" | "plus" | "grip" | "check" | "close" | "trash"; size?: number }) {
+function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "search" | "bell" | "plus" | "grip" | "check" | "close" | "trash" | "warning" | "chevron"; size?: number }) {
   const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
   const paths = {
     spark: <><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z" /><path d="m19 14 .9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14Z" /></>,
@@ -53,6 +71,8 @@ function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "s
     check: <path d="m5 12 4 4L19 6" />,
     close: <><path d="m18 6-12 12M6 6l12 12" /></>,
     trash: <><path d="M4 7h16" /><path d="M10 11v6M14 11v6" /><path d="m5 7 1 13h12l1-13M9 7V4h6v3" /></>,
+    warning: <><path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4M12 17h.01" /></>,
+    chevron: <path d="m7 10 5 5 5-5" />,
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
@@ -65,6 +85,9 @@ export default function Home() {
   const [showCompleted, setShowCompleted] = useState(true);
   const [adding, setAdding] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("Personal");
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -106,13 +129,33 @@ export default function Home() {
   const openCount = tasks.filter((task) => !task.completed).length;
   const doneCount = tasks.length - openCount;
 
-  async function saveTask(task: Task) {
+  async function saveTask(task: Task, previousTask?: Task) {
     if (!supabase) return;
-    const { error: saveError } = await supabase.from("todos").upsert(task);
-    if (saveError) setError("Could not save that change to Supabase. Please try again.");
+    try {
+      const { data, error: saveError } = await supabase
+        .from("todos")
+        .upsert(task)
+        .select(taskColumns)
+        .single();
+      if (saveError) throw saveError;
+      if (data) {
+        setTasks((current) => current.map((item) =>
+          item.id === task.id && sameTask(item, task) ? data : item,
+        ));
+      }
+    } catch {
+      setTasks((current) => {
+        const currentTask = current.find((item) => item.id === task.id);
+        if (!currentTask || !sameTask(currentTask, task)) return current;
+        return previousTask
+          ? current.map((item) => item.id === task.id ? previousTask : item)
+          : current.filter((item) => item.id !== task.id);
+      });
+      setError("Could not save that change to Supabase. Please try again.");
+    }
   }
 
-  async function addTask(event: FormEvent<HTMLFormElement>) {
+  function addTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const title = String(form.get("title") ?? "").trim();
@@ -121,11 +164,11 @@ export default function Home() {
       const updated: Task = {
         ...editingTask,
         title,
-        category: String(form.get("category") ?? editingTask.category),
+        category: selectedCategory,
         due_date: String(form.get("due_date") ?? editingTask.due_date),
       };
       setTasks((current) => current.map((task) => task.id === updated.id ? updated : task));
-      await saveTask(updated);
+      void saveTask(updated, editingTask);
       setAdding(false);
       setEditingTask(null);
       return;
@@ -133,60 +176,94 @@ export default function Home() {
     const task: Task = {
       id: crypto.randomUUID(),
       title,
-      category: String(form.get("category") ?? "Personal"),
+      category: selectedCategory,
       due_date: String(form.get("due_date") ?? localDate),
       completed: false,
       position: tasks.length,
     };
     setTasks((current) => [...current, task]);
-    await saveTask(task);
+    void saveTask(task);
     setAdding(false);
   }
 
   function openAddTodo() {
     setEditingTask(null);
+    setSelectedCategory("Personal");
+    setCategoryOpen(false);
     setAdding(true);
   }
 
   function openEditTodo(task: Task) {
     setEditingTask(task);
+    setSelectedCategory(task.category);
+    setCategoryOpen(false);
     setAdding(true);
   }
 
   function closeTodoDialog() {
     setAdding(false);
     setEditingTask(null);
+    setCategoryOpen(false);
   }
 
-  async function deleteTodo(task: Task) {
-    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
-    const previousTasks = tasks;
+  function deleteTodo(task: Task) {
+    const previousIndex = tasks.findIndex((item) => item.id === task.id);
     setTasks((current) => current.filter((item) => item.id !== task.id));
-    if (supabase) {
-      const { error: deleteError } = await supabase.from("todos").delete().eq("id", task.id);
-      if (deleteError) {
-        setTasks(previousTasks);
+    if (!supabase) return;
+    void (async () => {
+      try {
+        const { error: deleteError } = await supabase.from("todos").delete().eq("id", task.id);
+        if (deleteError) throw deleteError;
+      } catch {
+        setTasks((current) => current.some((item) => item.id === task.id)
+          ? current
+          : [...current.slice(0, previousIndex), task, ...current.slice(previousIndex)]);
         setError("Could not delete that todo from Supabase. Please try again.");
       }
-    }
+    })();
+  }
+
+  function confirmDeleteTodo() {
+    if (!deletingTask) return;
+    const task = deletingTask;
+    setDeletingTask(null);
+    deleteTodo(task);
   }
 
   async function toggleTask(task: Task) {
     const updated = { ...task, completed: !task.completed };
     setTasks((current) => current.map((item) => item.id === task.id ? updated : item));
-    await saveTask(updated);
+    void saveTask(updated, task);
   }
 
-  async function saveOrder(orderedTasks: Task[]) {
+  function saveOrder(orderedTasks: Task[]) {
     const positioned = orderedTasks.map((task, index) => ({ ...task, position: index }));
     setTasks(positioned);
-    if (supabase) {
-      const { error: saveError } = await supabase.from("todos").upsert(positioned);
-      if (saveError) setError("Could not save the new order to Supabase.");
-    }
+    if (!supabase) return;
+    void (async () => {
+      try {
+        const { data, error: saveError } = await supabase
+          .from("todos")
+          .upsert(positioned)
+          .select(taskColumns);
+        if (saveError) throw saveError;
+        if (data) {
+          const persistedById = new Map(data.map((task) => [task.id, task]));
+          setTasks((current) => current.every((task, index) => sameTask(task, positioned[index]))
+            ? current.map((task) => persistedById.get(task.id) ?? task)
+            : current);
+        }
+      } catch {
+        setTasks((current) => current.length === positioned.length
+          && current.every((task, index) => sameTask(task, positioned[index]))
+          ? orderedTasks
+          : current);
+        setError("Could not save the new order to Supabase.");
+      }
+    })();
   }
 
-  async function moveTask(targetId: string) {
+  function moveTask(targetId: string) {
     if (!draggedId || draggedId === targetId) return;
     const reordered = [...tasks];
     const fromIndex = reordered.findIndex((task) => task.id === draggedId);
@@ -195,17 +272,17 @@ export default function Home() {
     const [moved] = reordered.splice(fromIndex, 1);
     reordered.splice(toIndex, 0, moved);
     setDraggedId(null);
-    await saveOrder(reordered);
+    saveOrder(reordered);
   }
 
-  async function moveTaskByOffset(taskId: string, offset: number) {
+  function moveTaskByOffset(taskId: string, offset: number) {
     const fromIndex = tasks.findIndex((task) => task.id === taskId);
     const toIndex = fromIndex + offset;
     if (fromIndex < 0 || toIndex < 0 || toIndex >= tasks.length) return;
     const reordered = [...tasks];
     const [moved] = reordered.splice(fromIndex, 1);
     reordered.splice(toIndex, 0, moved);
-    await saveOrder(reordered);
+    saveOrder(reordered);
   }
 
   return (
@@ -216,9 +293,7 @@ export default function Home() {
         <nav className="side-nav" aria-label="Todo filters">
           {[
             { name: "All todos", icon: "spark" as const, count: openCount },
-            { name: "Personal", icon: "calendar" as const },
-            { name: "Work", icon: "archive" as const },
-            { name: "Errands", icon: "calendar" as const },
+            ...todoCategories.map(({ name, icon }) => ({ name, icon, count: undefined })),
           ].map((item) => (
             <button className={`nav-item ${filter === item.name ? "active" : ""}`} key={item.name} onClick={() => setFilter(item.name)}>
               <Icon name={item.icon} size={17} /><span>{item.name}</span>{item.count !== undefined && <span className="nav-count">{item.count}</span>}
@@ -245,7 +320,7 @@ export default function Home() {
             {!ready ? <div className="loading-list">Getting your day ready...</div> : (
               <div className="task-grid">
                 {visibleTasks.map((task) => <article key={task.id} className={`task-card ${colorByCategory[task.category] ?? "mint"} ${task.completed ? "is-complete" : ""} ${draggedId === task.id ? "is-dragging" : ""}`} role="group" aria-label={`Todo: ${task.title}. Press Enter to edit.`} tabIndex={0} onClick={() => openEditTodo(task)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); openEditTodo(task); } }} onDragOver={(event) => event.preventDefault()} onDrop={() => void moveTask(task.id)}>
-                  <div className="card-top"><span className="category-dot" /> <span className="card-category">{task.category}</span><span className="card-actions"><button className="drag-handle" aria-label="Drag to reorder" title="Drag to reorder" draggable onDragStart={(event) => { event.stopPropagation(); event.dataTransfer.setData("text/plain", task.id); setDraggedId(task.id); }} onDragEnd={(event) => { event.stopPropagation(); setDraggedId(null); }} onClick={(event) => event.stopPropagation()}><Icon name="grip" size={19} /></button><button className="task-check" onClick={(event) => { event.stopPropagation(); void toggleTask(task); }} aria-label={task.completed ? "Mark as not done" : "Mark as done"} aria-pressed={task.completed}>{task.completed && <Icon name="check" size={16} />}</button><button className="delete-todo-button" onClick={(event) => { event.stopPropagation(); void deleteTodo(task); }} aria-label={`Delete ${task.title}`} title="Delete todo"><Icon name="trash" size={16} /></button></span></div>
+                  <div className="card-top"><span className="category-dot" /> <span className="card-category">{task.category}</span><span className="card-actions"><button className="drag-handle" aria-label="Drag to reorder" title="Drag to reorder" draggable onDragStart={(event) => { event.stopPropagation(); event.dataTransfer.setData("text/plain", task.id); setDraggedId(task.id); }} onDragEnd={(event) => { event.stopPropagation(); setDraggedId(null); }} onClick={(event) => event.stopPropagation()}><Icon name="grip" size={19} /></button><button className="task-check" onClick={(event) => { event.stopPropagation(); void toggleTask(task); }} aria-label={task.completed ? "Mark as not done" : "Mark as done"} aria-pressed={task.completed}>{task.completed && <Icon name="check" size={16} />}</button><button className="delete-todo-button" onClick={(event) => { event.stopPropagation(); setDeletingTask(task); }} aria-label={`Delete ${task.title}`} title="Delete todo"><Icon name="trash" size={16} /></button></span></div>
                   <div className="card-middle"><p className="task-title">{task.title}</p><span className={`task-date ${task.due_date < localDate && !task.completed ? "overdue" : ""}`}>{formatDate(task.due_date)}{task.due_date < localDate && !task.completed ? " · gently overdue" : ""}</span></div>
                   <div className="card-bottom"><span className="card-date-icon"><Icon name="calendar" size={13} /> {new Date(`${task.due_date}T12:00:00`).toLocaleDateString("en", { month: "short", day: "numeric" })}</span><span className="move-controls"><button onClick={(event) => { event.stopPropagation(); void moveTaskByOffset(task.id, -1); }} aria-label={`Move ${task.title} up`} title="Move up" disabled={tasks[0]?.id === task.id}>↑</button><button onClick={(event) => { event.stopPropagation(); void moveTaskByOffset(task.id, 1); }} aria-label={`Move ${task.title} down`} title="Move down" disabled={tasks[tasks.length - 1]?.id === task.id}>↓</button></span></div>
                 </article>)}
@@ -260,7 +335,9 @@ export default function Home() {
         <button className="mobile-add" onClick={openAddTodo} aria-label="Add a todo"><Icon name="plus" size={23} /></button>
       </section>
 
-      {adding && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeTodoDialog(); }}><section className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-header"><div><span className="section-kicker">{editingTask ? "A QUICK UPDATE" : "A FRESH START"}</span><h2 id="modal-title">{editingTask ? "Edit todo" : "Add a todo"}</h2></div><button className="icon-button" onClick={closeTodoDialog} aria-label="Close"><Icon name="close" /></button></div><form key={editingTask?.id ?? "new-todo"} className="flex flex-col" onSubmit={(event) => void addTask(event)}><label className="field-label" htmlFor="new-title">What&apos;s on your mind?</label><input id="new-title" className="form-input" name="title" placeholder="Write it down, get it out of your head..." defaultValue={editingTask?.title ?? ""} autoFocus required maxLength={140} /><div className="form-row"><label className="form-field"><span className="field-label">A little list</span><select className="form-input" name="category" defaultValue={editingTask?.category ?? "Personal"}><option>Personal</option><option>Work</option><option>Errands</option><option>Ideas</option></select></label><label className="form-field"><span className="field-label">When-ish?</span><input className="form-input" name="due_date" type="date" defaultValue={editingTask?.due_date ?? localDate} required /></label></div><button className="submit-button" type="submit"><Icon name={editingTask ? "check" : "plus"} size={17} />{editingTask ? "Save changes" : "Add a todo"}</button></form></section></div>}
+      {adding && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeTodoDialog(); }}><section className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-header"><div><span className="section-kicker">{editingTask ? "A QUICK UPDATE" : "A FRESH START"}</span><h2 id="modal-title">{editingTask ? "Edit todo" : "Add a todo"}</h2></div><button className="icon-button" onClick={closeTodoDialog} aria-label="Close"><Icon name="close" /></button></div><form key={editingTask?.id ?? "new-todo"} className="flex flex-col" onSubmit={(event) => void addTask(event)}><label className="field-label" htmlFor="new-title">What&apos;s on your mind?</label><input id="new-title" className="form-input" name="title" placeholder="Write it down, get it out of your head..." defaultValue={editingTask?.title ?? ""} autoFocus required maxLength={140} /><div className="form-row"><div className="form-field"><span className="field-label" id="category-label">Category</span><div className="category-select"><button className="category-select-trigger" type="button" role="combobox" aria-labelledby="category-label" aria-haspopup="listbox" aria-expanded={categoryOpen} aria-controls="category-options" onClick={() => setCategoryOpen((open) => !open)}><span className={`category-select-swatch ${colorByCategory[selectedCategory] ?? "mint"}`} />{selectedCategory}<Icon name="chevron" size={17} /></button>{categoryOpen && <div className="category-options" id="category-options" role="listbox" aria-labelledby="category-label">{todoCategories.map(({ name: category }) => <button className="category-option" key={category} type="button" role="option" aria-selected={selectedCategory === category} onClick={() => { setSelectedCategory(category); setCategoryOpen(false); }}><span className={`category-select-swatch ${colorByCategory[category]}`} />{category}{selectedCategory === category && <Icon name="check" size={16} />}</button>)}</div>}</div></div><div className="form-field"><label className="field-label" htmlFor="due-date">Due date</label><div className="date-input-wrap"><Icon name="calendar" size={17} /><input id="due-date" className="form-input date-input" name="due_date" type="date" defaultValue={editingTask?.due_date ?? localDate} required /></div></div></div><button className="submit-button" type="submit"><Icon name={editingTask ? "check" : "plus"} size={17} />{editingTask ? "Save changes" : "Add a todo"}</button></form></section></div>}
+
+      {deletingTask && <div className="delete-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setDeletingTask(null); }} onKeyDown={(event) => { if (event.key === "Escape") setDeletingTask(null); }}><section className="delete-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description"><div className="drawer-handle" /><div className="warning-icon"><Icon name="warning" size={25} /></div><h2 id="delete-title">Delete this todo?</h2><p id="delete-description">You&apos;re about to remove <strong>&ldquo;{deletingTask.title}&rdquo;</strong> from your list. It won&apos;t be possible to recover it.</p><div className="delete-actions"><button className="delete-cancel-button" autoFocus onClick={() => setDeletingTask(null)}>Keep this todo</button><button className="delete-confirm-button" onClick={confirmDeleteTodo}><Icon name="trash" size={16} />Delete todo</button></div></section></div>}
     </main>
   );
 }
