@@ -14,6 +14,7 @@
   --peach: #efc09f;
   --teal: #a8d1ca;
   --lime: #d2dfa1;
+  --stone: #d2d4ce;
 }
 
 * { box-sizing: border-box; }
@@ -104,6 +105,7 @@ h1 > span { color: #9d9b74; }
 .task-card.peach { background: var(--peach); }
 .task-card.teal { background: var(--teal); }
 .task-card.lime { background: var(--lime); }
+.task-card.stone { background: var(--stone); }
 .card-top, .card-bottom { display: flex; align-items: center; }
 .card-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
 .category-dot { width: 7px; height: 7px; border-radius: 50%; background: #ffffffbd; box-shadow: 0 0 0 2px #0000000b; }
@@ -177,7 +179,8 @@ h1 > span { color: #9d9b74; }
 .category-select-swatch.peach { background: #b97749; }
 .category-select-swatch.teal { background: #478b83; }
 .category-select-swatch.lime { background: #829344; }
-.category-options { position: absolute; z-index: 7; top: calc(100% + 7px); left: 0; display: grid; width: 100%; gap: 3px; padding: 5px; border: 1px solid #e8e9ee; border-radius: 10px; background: #fff; box-shadow: 0 12px 28px #25273320; animation: modal-in .14s ease; }
+.category-select-swatch.stone { background: #82857c; }
+.category-options { position: absolute; z-index: 7; top: calc(100% + 7px); left: 0; display: grid; width: 100%; max-height: 190px; gap: 3px; overflow-y: auto; overscroll-behavior: contain; padding: 5px; border: 1px solid #e8e9ee; border-radius: 10px; background: #fff; box-shadow: 0 12px 28px #25273320; scrollbar-color: #c5c7d0 transparent; scrollbar-width: thin; animation: modal-in .14s ease; }
 .category-option { display: flex; min-height: 42px; align-items: center; gap: 10px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: #555761; cursor: pointer; font-size: 12px; text-align: left; }
 .category-option:hover, .category-option[aria-selected="true"] { background: #f1f2f5; color: #30313a; }
 .category-option[aria-selected="true"] { font-weight: 700; }
@@ -186,6 +189,26 @@ h1 > span { color: #9d9b74; }
 .date-input-wrap > svg { position: absolute; left: 12px; flex: none; color: #848691; pointer-events: none; }
 .date-input { height: 46px; padding: 0 11px 0 38px; border-color: transparent; background: transparent; color-scheme: light; font-size: 13px; }
 .date-input::-webkit-calendar-picker-indicator { width: 18px; height: 18px; opacity: .58; cursor: pointer; }
+.date-picker-trigger { display: none; }
+.date-picker-backdrop { position: fixed; z-index: 8; inset: 0; display: grid; align-items: end; justify-items: center; padding: 18px; background: #24252d75; animation: fade-in .18s ease; }
+.date-picker-sheet { width: min(100%, 440px); padding: 10px 22px 18px; border: 1px solid #ebeaf0; border-radius: 18px; background: #fbfbfd; box-shadow: 0 20px 70px #17182040; animation: drawer-in .24s cubic-bezier(.2, .75, .25, 1); }
+.date-picker-handle { width: 38px; height: 4px; margin: 0 auto 17px; border-radius: 4px; background: #d7d8de; }
+.date-picker-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.date-picker-heading h2 { margin: 0; color: #292a31; font-family: 'Manrope', sans-serif; font-size: 17px; font-weight: 700; }
+.date-picker-heading > span { color: #777985; font-size: 11px; font-weight: 600; }
+.date-wheel { position: relative; display: grid; height: 220px; grid-template-columns: 68px minmax(0, 1fr) 92px; gap: 3px; margin: 17px 0; overflow: hidden; }
+.date-wheel-selection { position: absolute; z-index: 0; top: 88px; right: 0; left: 0; height: 44px; border-top: 1px solid #e2e4e9; border-bottom: 1px solid #e2e4e9; border-radius: 7px; background: #f1f2f5; pointer-events: none; }
+.date-wheel-column { position: relative; z-index: 1; height: 220px; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; scrollbar-width: none; mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
+.date-wheel-column::-webkit-scrollbar { display: none; }
+.date-wheel-options { display: grid; padding: 88px 0; }
+.date-wheel-option { display: grid; width: 100%; height: 44px; place-items: center; padding: 0 3px; border: 0; background: transparent; color: #a1a3ad; cursor: pointer; font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 600; scroll-snap-align: center; }
+.date-wheel-option[aria-selected="true"] { color: #292a31; font-size: 17px; font-weight: 800; }
+.date-picker-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.date-picker-actions button { min-height: 45px; border: 0; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; }
+.date-picker-cancel { background: #edf0f3; color: #555863; }
+.date-picker-cancel:hover { background: #e3e6eb; }
+.date-picker-done { background: #333843; color: #fff; }
+.date-picker-done:hover { background: #4c514c; }
 .submit-button { display: flex; width: 100%; height: 43px; align-items: center; justify-content: center; gap: 8px; margin-top: 23px; border: 0; border-radius: 7px; background: #303540; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; transition: background .15s ease; }
 .submit-button:hover { background: #4c514c; }
 @keyframes settle-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -250,6 +273,16 @@ h1 > span { color: #9d9b74; }
   .date-input { height: 48px; }
   .date-input-wrap { min-height: 48px; }
   .category-option { min-height: 46px; font-size: 14px; }
+  .category-options { max-height: 205px; }
+  .date-input-wrap { display: none; }
+  .date-picker-trigger { display: flex; width: 100%; min-height: 48px; align-items: center; gap: 11px; padding: 0 12px; border: 1px solid #e4e5eb; border-radius: 8px; background: #fff; color: #30313a; cursor: pointer; font-size: 16px; font-weight: 600; text-align: left; }
+  .date-picker-trigger > svg:first-child { color: #848691; }
+  .date-picker-trigger > svg:last-child { margin-left: auto; color: #81838d; }
+  .date-picker-backdrop { padding: 0; }
+  .date-picker-sheet { width: 100%; max-width: none; padding: 10px 22px calc(18px + env(safe-area-inset-bottom)); border-right: 0; border-bottom: 0; border-left: 0; border-radius: 20px 20px 0 0; }
+  .date-wheel { grid-template-columns: 66px minmax(0, 1fr) 90px; }
+  .date-picker-heading h2 { font-size: 18px; }
+  .date-picker-actions button { min-height: 48px; }
   .drawer-handle { display: block; width: 38px; height: 4px; margin: 0 auto 21px; border-radius: 4px; background: #d7d8de; }
   .warning-icon { margin: 0 auto 13px; }
   .delete-modal h2, .delete-modal p { text-align: center; }

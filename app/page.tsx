@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Task = {
@@ -38,6 +38,7 @@ const todoCategories = [
   { name: "Home", icon: "calendar", color: "peach" },
   { name: "Health", icon: "check", color: "teal" },
   { name: "Learning", icon: "spark", color: "lime" },
+  { name: "Others", icon: "archive", color: "stone" },
 ] as const;
 
 const colorByCategory = Object.fromEntries(
@@ -77,6 +78,80 @@ function Icon({ name, size = 18 }: { name: "spark" | "calendar" | "archive" | "s
   return <svg {...common}>{paths[name]}</svg>;
 }
 
+const monthOptions = Array.from({ length: 12 }, (_, month) => month);
+const monthLabels = monthOptions.map((month) => new Intl.DateTimeFormat("en", { month: "short" }).format(new Date(2026, month, 1)));
+
+function DateWheelColumn({ label, values, value, format, onChange }: {
+  label: string;
+  values: number[];
+  value: number;
+  format: (value: number) => string;
+  onChange: (value: number) => void;
+}) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const selectedIndex = values.indexOf(value);
+    if (selectedIndex >= 0 && listRef.current) listRef.current.scrollTop = selectedIndex * 44;
+  }, [value, values]);
+
+  function selectAtScrollPosition(element: HTMLDivElement) {
+    const index = Math.round(element.scrollTop / 44);
+    const nextValue = values[index];
+    if (nextValue !== undefined && nextValue !== value) onChange(nextValue);
+  }
+
+  return <div className="date-wheel-column" role="listbox" aria-label={label} ref={listRef} onScroll={(event) => selectAtScrollPosition(event.currentTarget)}>
+    <div className="date-wheel-options">
+      {values.map((option) => <button className="date-wheel-option" key={option} type="button" role="option" aria-selected={option === value} onClick={() => { onChange(option); if (listRef.current) listRef.current.scrollTop = values.indexOf(option) * 44; }}>{format(option)}</button>)}
+    </div>
+  </div>;
+}
+
+function MobileDatePicker({ value, onCancel, onDone }: { value: string; onCancel: () => void; onDone: (value: string) => void }) {
+  const initialDate = new Date(`${value}T12:00:00`);
+  const [year, setYear] = useState(initialDate.getFullYear());
+  const [month, setMonth] = useState(initialDate.getMonth());
+  const [day, setDay] = useState(initialDate.getDate());
+  const currentYear = new Date().getFullYear();
+  const years = useMemo(() => {
+    const options = Array.from({ length: 12 }, (_, index) => currentYear - 1 + index);
+    if (!options.includes(year)) options.push(year);
+    return options.sort((first, second) => first - second);
+  }, [currentYear, year]);
+  const days = useMemo(() => {
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    return Array.from({ length: daysInMonth }, (_, index) => index + 1);
+  }, [year, month]);
+  const selectedDate = new Date(year, month, day, 12);
+  const selectedDateLabel = selectedDate.toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  const dateValue = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  function changeMonth(nextMonth: number) {
+    setMonth(nextMonth);
+    setDay((currentDay) => Math.min(currentDay, new Date(year, nextMonth + 1, 0).getDate()));
+  }
+
+  function changeYear(nextYear: number) {
+    setYear(nextYear);
+    setDay((currentDay) => Math.min(currentDay, new Date(nextYear, month + 1, 0).getDate()));
+  }
+
+  return <div className="date-picker-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onCancel(); }} onKeyDown={(event) => { if (event.key === "Escape") onCancel(); }}>
+    <section className="date-picker-sheet" role="dialog" aria-modal="true" aria-labelledby="date-picker-title">
+      <div className="date-picker-handle" />
+      <div className="date-picker-heading"><h2 id="date-picker-title">Choose a due date</h2><span>{selectedDateLabel}</span></div>
+      <div className="date-wheel" aria-label="Due date">
+        <div className="date-wheel-selection" />
+        <DateWheelColumn label="Day" values={days} value={day} format={(option) => String(option).padStart(2, "0")} onChange={setDay} />
+        <DateWheelColumn label="Month" values={monthOptions} value={month} format={(option) => monthLabels[option]} onChange={changeMonth} />
+        <DateWheelColumn label="Year" values={years} value={year} format={String} onChange={changeYear} />
+      </div>
+      <div className="date-picker-actions"><button type="button" className="date-picker-cancel" autoFocus onClick={onCancel}>Cancel</button><button type="button" className="date-picker-done" onClick={() => onDone(dateValue)}>Done</button></div>
+    </section>
+  </div>;
+}
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [ready, setReady] = useState(false);
@@ -87,6 +162,8 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("Personal");
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [selectedDueDate, setSelectedDueDate] = useState(localDate);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -165,7 +242,7 @@ export default function Home() {
         ...editingTask,
         title,
         category: selectedCategory,
-        due_date: String(form.get("due_date") ?? editingTask.due_date),
+        due_date: selectedDueDate,
       };
       setTasks((current) => current.map((task) => task.id === updated.id ? updated : task));
       void saveTask(updated, editingTask);
@@ -177,7 +254,7 @@ export default function Home() {
       id: crypto.randomUUID(),
       title,
       category: selectedCategory,
-      due_date: String(form.get("due_date") ?? localDate),
+      due_date: selectedDueDate,
       completed: false,
       position: tasks.length,
     };
@@ -189,14 +266,18 @@ export default function Home() {
   function openAddTodo() {
     setEditingTask(null);
     setSelectedCategory("Personal");
+    setSelectedDueDate(localDate);
     setCategoryOpen(false);
+    setDatePickerOpen(false);
     setAdding(true);
   }
 
   function openEditTodo(task: Task) {
     setEditingTask(task);
     setSelectedCategory(task.category);
+    setSelectedDueDate(task.due_date);
     setCategoryOpen(false);
+    setDatePickerOpen(false);
     setAdding(true);
   }
 
@@ -204,6 +285,7 @@ export default function Home() {
     setAdding(false);
     setEditingTask(null);
     setCategoryOpen(false);
+    setDatePickerOpen(false);
   }
 
   function deleteTodo(task: Task) {
@@ -335,7 +417,8 @@ export default function Home() {
         <button className="mobile-add" onClick={openAddTodo} aria-label="Add a todo"><Icon name="plus" size={23} /></button>
       </section>
 
-      {adding && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeTodoDialog(); }}><section className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-header"><div><span className="section-kicker">{editingTask ? "A QUICK UPDATE" : "A FRESH START"}</span><h2 id="modal-title">{editingTask ? "Edit todo" : "Add a todo"}</h2></div><button className="icon-button" onClick={closeTodoDialog} aria-label="Close"><Icon name="close" /></button></div><form key={editingTask?.id ?? "new-todo"} className="flex flex-col" onSubmit={(event) => void addTask(event)}><label className="field-label" htmlFor="new-title">What&apos;s on your mind?</label><input id="new-title" className="form-input" name="title" placeholder="Write it down, get it out of your head..." defaultValue={editingTask?.title ?? ""} autoFocus required maxLength={140} /><div className="form-row"><div className="form-field"><span className="field-label" id="category-label">Category</span><div className="category-select"><button className="category-select-trigger" type="button" role="combobox" aria-labelledby="category-label" aria-haspopup="listbox" aria-expanded={categoryOpen} aria-controls="category-options" onClick={() => setCategoryOpen((open) => !open)}><span className={`category-select-swatch ${colorByCategory[selectedCategory] ?? "mint"}`} />{selectedCategory}<Icon name="chevron" size={17} /></button>{categoryOpen && <div className="category-options" id="category-options" role="listbox" aria-labelledby="category-label">{todoCategories.map(({ name: category }) => <button className="category-option" key={category} type="button" role="option" aria-selected={selectedCategory === category} onClick={() => { setSelectedCategory(category); setCategoryOpen(false); }}><span className={`category-select-swatch ${colorByCategory[category]}`} />{category}{selectedCategory === category && <Icon name="check" size={16} />}</button>)}</div>}</div></div><div className="form-field"><label className="field-label" htmlFor="due-date">Due date</label><div className="date-input-wrap"><Icon name="calendar" size={17} /><input id="due-date" className="form-input date-input" name="due_date" type="date" defaultValue={editingTask?.due_date ?? localDate} required /></div></div></div><button className="submit-button" type="submit"><Icon name={editingTask ? "check" : "plus"} size={17} />{editingTask ? "Save changes" : "Add a todo"}</button></form></section></div>}
+      {adding && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeTodoDialog(); }}><section className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-header"><div><span className="section-kicker">{editingTask ? "A QUICK UPDATE" : "A FRESH START"}</span><h2 id="modal-title">{editingTask ? "Edit todo" : "Add a todo"}</h2></div><button className="icon-button" onClick={closeTodoDialog} aria-label="Close"><Icon name="close" /></button></div><form key={editingTask?.id ?? "new-todo"} className="flex flex-col" onSubmit={(event) => void addTask(event)}><label className="field-label" htmlFor="new-title">What&apos;s on your mind?</label><input id="new-title" className="form-input" name="title" placeholder="Write it down, get it out of your head..." defaultValue={editingTask?.title ?? ""} autoFocus required maxLength={140} /><div className="form-row"><div className="form-field"><span className="field-label" id="category-label">Category</span><div className="category-select"><button className="category-select-trigger" type="button" role="combobox" aria-labelledby="category-label" aria-haspopup="listbox" aria-expanded={categoryOpen} aria-controls="category-options" onClick={() => setCategoryOpen((open) => !open)}><span className={`category-select-swatch ${colorByCategory[selectedCategory] ?? "mint"}`} />{selectedCategory}<Icon name="chevron" size={17} /></button>{categoryOpen && <div className="category-options" id="category-options" role="listbox" aria-labelledby="category-label">{todoCategories.map(({ name: category }) => <button className="category-option" key={category} type="button" role="option" aria-selected={selectedCategory === category} onClick={() => { setSelectedCategory(category); setCategoryOpen(false); }}><span className={`category-select-swatch ${colorByCategory[category]}`} />{category}{selectedCategory === category && <Icon name="check" size={16} />}</button>)}</div>}</div></div><div className="form-field"><label className="field-label" htmlFor="due-date">Due date</label><div className="date-input-wrap"><Icon name="calendar" size={17} /><input id="due-date" className="form-input date-input" name="due_date" type="date" value={selectedDueDate} onChange={(event) => setSelectedDueDate(event.target.value)} required /></div><button className="date-picker-trigger" type="button" aria-label={`Choose due date, ${selectedDueDate}`} onClick={() => { setCategoryOpen(false); setDatePickerOpen(true); }}><Icon name="calendar" size={18} /><span>{new Date(`${selectedDueDate}T12:00:00`).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</span><Icon name="chevron" size={17} /></button></div></div><button className="submit-button" type="submit"><Icon name={editingTask ? "check" : "plus"} size={17} />{editingTask ? "Save changes" : "Add a todo"}</button></form></section></div>}
+      {datePickerOpen && <MobileDatePicker value={selectedDueDate} onCancel={() => setDatePickerOpen(false)} onDone={(date) => { setSelectedDueDate(date); setDatePickerOpen(false); }} />}
 
       {deletingTask && <div className="delete-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setDeletingTask(null); }} onKeyDown={(event) => { if (event.key === "Escape") setDeletingTask(null); }}><section className="delete-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description"><div className="drawer-handle" /><div className="warning-icon"><Icon name="warning" size={25} /></div><h2 id="delete-title">Delete this todo?</h2><p id="delete-description">You&apos;re about to remove <strong>&ldquo;{deletingTask.title}&rdquo;</strong> from your list. It won&apos;t be possible to recover it.</p><div className="delete-actions"><button className="delete-cancel-button" autoFocus onClick={() => setDeletingTask(null)}>Keep this todo</button><button className="delete-confirm-button" onClick={confirmDeleteTodo}><Icon name="trash" size={16} />Delete todo</button></div></section></div>}
     </main>
