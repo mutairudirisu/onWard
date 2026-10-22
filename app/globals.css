@@ -209,3 +209,44 @@
   .journey-dashboard .task-copy>b { font-size:12px; }
   .journey-dashboard .task-time { font-size:9px; }
 }
+
+/* Roomier home controls and flush mobile sheets. */
+.modal-backdrop { padding:0; }
+.task-dialog,.creation-chooser { margin:0; }
+
+@media (max-width:760px) {
+  .modal-backdrop { align-items:end; }
+  .task-dialog,.creation-chooser { width:100%; max-width:none; max-height:100dvh; overflow-y:auto; border-right:0; border-bottom:0; border-left:0; border-radius:24px 24px 0 0; }
+  .creation-chooser { padding:24px 20px calc(24px + env(safe-area-inset-bottom)); }
+
+  .dashboard.journey-dashboard > .greeting.journey-greeting { min-height:122px; padding:calc(28px + env(safe-area-inset-top)) 22px 20px; }
+  .journey-greeting h1::before { content:"Welcome, "; }
+  .journey-greeting h1::after { content:"  👋"; letter-spacing:0; }
+  .journey-dashboard > .calendar { min-height:108px; padding:3px 0 12px; border-radius:0 0 28px 28px; box-shadow:0 10px 20px #57604b12; }
+  .journey-dashboard > .calendar .week-strip { gap:6px; padding:3px 18px 8px; }
+  .journey-dashboard > .calendar .date-button { min-height:70px; padding:5px 0 7px; }
+  .journey-dashboard > .calendar .date-button span { font-size:8px; }
+  .journey-dashboard > .calendar .date-button b { width:36px; height:34px; border-radius:10px; font-size:12px; }
+  .journey-dashboard > .calendar .date-button.selected b { border-radius:10px; }
+  .journey-dashboard > .calendar .calendar-handle { display:grid; width:100%; gap:3px; margin:2px auto 0; padding:5px 0 0; color:#798076; }
+  .journey-dashboard > .calendar .calendar-handle span { width:30px; height:3px; border-radius:3px; background:#b9beb5; }
+  .journey-dashboard > .calendar .calendar-handle small { display:block; font-size:9px; }
+  .journey-dashboard > .calendar.expanded { padding-bottom:13px; }
+  .journey-dashboard > .calendar .date-button.month { min-height:42px; }
+  .journey-dashboard > .calendar .date-button.month span { width:30px; height:30px; border-radius:9px; }
+  .journey-dashboard > .focus-list { gap:9px; padding:10px 18px 24px; border:0; border-radius:0; background:var(--soft); box-shadow:none; }
+  .journey-dashboard > .focus-list .focus-task,.journey-dashboard > .focus-list.cards .focus-task { min-height:74px; padding:13px 15px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+  .journey-dashboard > .focus-list .focus-task:last-child { border-bottom:1px solid var(--line); }
+}
+
+:root[data-theme="dark"] .profile-clean { background:var(--paper); }
+:root[data-theme="dark"] .profile-identity h1,:root[data-theme="dark"] .profile-row b { color:var(--ink); }
+:root[data-theme="dark"] .profile-identity p,:root[data-theme="dark"] .profile-row small { color:var(--muted); }
+:root[data-theme="dark"] .profile-group>div,:root[data-theme="dark"] .profile-row,:root[data-theme="dark"] .profile-directory { border-color:var(--line); background:var(--surface); }
+:root[data-theme="dark"] .journey-dashboard > .greeting.journey-greeting,:root[data-theme="dark"] .journey-dashboard > .calendar { background:#1a211c; }
+:root[data-theme="dark"] .journey-greeting h1 { color:var(--ink); }
+:root[data-theme="dark"] .journey-greeting>div>p:last-child { color:var(--muted); }
+:root[data-theme="dark"] .journey-dashboard > .calendar .date-button b { background:#252d27; color:var(--ink); box-shadow:none; }
+:root[data-theme="dark"] .journey-dashboard > .focus-heading,:root[data-theme="dark"] .journey-dashboard > .focus-list,:root[data-theme="dark"] .journey-dashboard > .empty-focus { background:var(--paper); }
+:root[data-theme="dark"] .journey-dashboard > .calendar .calendar-handle { color:var(--muted); }
+:root[data-theme="dark"] .journey-dashboard > .calendar .calendar-handle span { background:#697368; }
