@@ -29,7 +29,7 @@ The first time, the sample todos save only in this browser. You can try the app 
 6. Stop the running app with **Ctrl+C** in the terminal, then run `npm run dev` again.
 
 7. In **Authentication → URL Configuration**, add `http://localhost:3000` to the redirect URL allow-list. Add your deployed app URL there too when you publish it.
-8. Email magic-link sign-in is enabled by default. To offer Google sign-in, open **Authentication → Providers → Google**, enable it, and add the Google OAuth client ID and secret supplied by Google Cloud.
+8. In **Authentication → Providers → Email**, enable email/password sign-in. New accounts use a six-digit confirmation code when email confirmation is enabled; see the note below for the required email template setting.
 
 ## Notifications and voice input
 
@@ -49,3 +49,7 @@ The green dot at the top means the app sees your Supabase settings. Without sett
 - `supabase/schema.sql` creates the database table.
 
 Made for steady little steps. onWard.
+
+## Email and password sign-in
+
+The app uses Supabase email/password authentication. In Supabase, enable email/password sign-in under Authentication providers. For the in-app six-digit confirmation screen, update the **Confirm signup** email template to include `{{ .Token }}`; otherwise Supabase's normal confirmation link remains the alternative verification path.

@@ -7,12 +7,18 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 test("PWA metadata defines a standalone mobile app", async () => {
   const manifest = await read("app/manifest.ts");
   const layout = await read("app/layout.tsx");
+  const icon = await read("public/icon.svg");
   assert.match(manifest, /id:\s*"\/"/);
   assert.match(manifest, /scope:\s*"\/"/);
   assert.match(manifest, /display:\s*"standalone"/);
   assert.match(manifest, /icons:/);
+  assert.match(manifest, /src:\s*"\/icon\.svg"/);
   assert.match(layout, /manifest:\s*"\/manifest\.webmanifest"/);
+  assert.match(layout, /url:\s*"\/icon\.svg"/);
   assert.match(layout, /appleWebApp:/);
+  assert.match(icon, />onWard<\/title>/);
+  assert.match(icon, />o<\/text>/);
+  assert.match(icon, />nWard<\/text>/);
 });
 
 test("PWA service worker registers during ordinary app use and updates safely", async () => {

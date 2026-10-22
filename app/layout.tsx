@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "onWard", statusBarStyle: "black-translucent" },
 };
 
-export const viewport: Viewport = { themeColor: "#111713", colorScheme: "light dark" };
+export const viewport: Viewport = { themeColor: "#ffffff", colorScheme: "light dark" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

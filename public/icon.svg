@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" rx="58" fill="#101521"/><path d="M128 39c12 36 19 43 55 55-36 12-43 19-55 55-12-36-19-43-55-55 36-12 43-19 55-55Zm52 101c8 24 13 29 37 37-24 8-29 13-37 37-8-24-13-29-37-37 24-8 29-13 37-37Z" fill="#71f7cf"/><circle cx="77" cy="178" r="19" fill="#f8bd7a"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">onWard</title>
+  <rect width="512" height="512" rx="96" fill="#ffffff"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="800" letter-spacing="-11">
+    <text x="66" y="296" fill="#b8f500" font-size="150">o</text>
+    <text x="146" y="296" fill="#292d2c" font-size="130">nWard</text>
+  </g>
+</svg>
