@@ -28,9 +28,18 @@ The first time, the sample todos save only in this browser. You can try the app 
 
 6. Stop the running app with **Ctrl+C** in the terminal, then run `npm run dev` again.
 
+7. In **Authentication → URL Configuration**, add `http://localhost:3000` to the redirect URL allow-list. Add your deployed app URL there too when you publish it.
+8. Email magic-link sign-in is enabled by default. To offer Google sign-in, open **Authentication → Providers → Google**, enable it, and add the Google OAuth client ID and secret supplied by Google Cloud.
+
+## Notifications and voice input
+
+- The Profile page can request browser notification permission. It registers the included service worker, which displays incoming Web Push messages.
+- To create a push subscription, add a VAPID public key as `NEXT_PUBLIC_VAPID_PUBLIC_KEY` in `.env.local`. A notification service or server endpoint must receive the resulting subscription and send the messages; the browser app stores a local copy for development.
+- The microphone button in plan and task title fields uses the browser's Web Speech API. It works in browsers that provide speech recognition and remains optional—typing always works.
+
 The green dot at the top means the app sees your Supabase settings. Without settings, it automatically saves todos in your browser instead. Todos made in local mode do not automatically move to Supabase.
 
-> **Privacy note:** The included SQL policies make this learning demo easy to try, but anyone with the project URL can read or edit its todos. Don't put private information in a demo project. A real private app should add Supabase Auth and restrict each todo to its owner.
+> **Privacy note:** The included SQL policies require a signed-in user and restrict every todo to its owner. Never expose a Supabase service-role key in the browser.
 
 ## Learn the project
 
