@@ -66,13 +66,13 @@ export function DraggableModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm transition-opacity animate-in fade-in"
+      className="draggable-modal-backdrop fixed inset-0 z-50 flex items-end justify-center p-0 md:items-center md:p-6 bg-black/50 backdrop-blur-sm transition-opacity animate-in fade-in"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
-        className={`relative w-full max-w-lg rounded-t-[28px] rounded-b-none border border-b-0 border-zinc-200 bg-white px-6 pb-8 pt-3 shadow-2xl transition-transform dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
+        className={`draggable-modal-sheet relative w-full max-w-lg rounded-t-[28px] rounded-b-none border border-b-0 md:rounded-[24px] md:border-b border-zinc-200 bg-white px-6 pb-8 pt-3 md:pt-6 shadow-2xl transition-transform dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
@@ -81,9 +81,9 @@ export function DraggableModal({
           transition: isDragging ? "none" : "transform 0.26s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        {/* Top Drag Handle for Drag-to-Dropdown gesture */}
+        {/* Top Drag Handle for Drag-to-Dropdown gesture on mobile */}
         <div
-          className="flex h-7 w-full cursor-grab items-center justify-center touch-none select-none active:cursor-grabbing"
+          className="flex h-7 w-full cursor-grab items-center justify-center touch-none select-none active:cursor-grabbing md:hidden"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}

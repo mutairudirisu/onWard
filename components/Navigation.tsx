@@ -7,7 +7,16 @@ import { useTasks } from "@/lib/task-context";
 
 export function Navigation() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTasks();
+  const { theme, setTheme, user } = useTasks();
+
+  const userName = String(
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Idris"
+  );
+  const userInitial = userName.slice(0, 1).toUpperCase();
+  const userSubtitle = user?.email || "Account & preferences";
 
   const isHomeActive = pathname === "/";
 
@@ -28,8 +37,14 @@ export function Navigation() {
     <>
       {/* Desktop Sidebar */}
       <aside className="sidebar">
-        <Link href="/" className="brand">
-          ON<span>WARD</span>
+        <Link href="/" className="brand" title="onWard by GIGS Labs">
+          <span className="brand-title">
+            <span className="brand-o">o</span>nWard
+          </span>
+          <span className="brand-subscript">
+            <span className="brand-by">by</span>
+            <span className="brand-author">GIGS Labs</span>
+          </span>
         </Link>
         <small>MAKE PROGRESS</small>
 
@@ -37,102 +52,118 @@ export function Navigation() {
           {/* Primary Section 1: Home */}
           <Link
             href="/"
-            className={isHomeActive ? "active" : ""}
+            className={`sidebar-nav-link ${isHomeActive ? "active" : ""}`}
             title="Home: Today's Journey & Calendar"
           >
-            <Icon name="home" />
+            <Icon name="home" size={18} />
             <span>Home</span>
           </Link>
 
           {/* Primary Section 2: Personal */}
           <Link
             href="/tasks"
-            className={isPersonalActive ? "active" : ""}
+            className={`sidebar-nav-link ${isPersonalActive ? "active" : ""}`}
             title="Personal: Tasks, Notes, Achievements, Work logs"
           >
-            <Icon name="user" />
+            <Icon name="user" size={18} />
             <span>Personal</span>
           </Link>
 
           {/* Personal Sub-items */}
           {isPersonalActive && (
-            <div className="ml-5 flex flex-col gap-1 border-l-2 border-[#b8e85e]/40 pl-2">
+            <div className="sidebar-subnav">
               <Link
                 href="/tasks"
-                className={`text-xs ${pathname.startsWith("/tasks") ? "font-bold text-[#496612] dark:text-[#d3f36b]" : "text-zinc-500"}`}
+                className={`sidebar-sub-link ${pathname.startsWith("/tasks") ? "active" : ""}`}
               >
+                <span className="sidebar-sub-dot" />
                 <span>Tasks & Reminders</span>
               </Link>
               <Link
                 href="/notes"
-                className={`text-xs ${pathname.startsWith("/notes") ? "font-bold text-[#496612] dark:text-[#d3f36b]" : "text-zinc-500"}`}
+                className={`sidebar-sub-link ${pathname.startsWith("/notes") ? "active" : ""}`}
               >
+                <span className="sidebar-sub-dot" />
                 <span>Personal Notes</span>
               </Link>
               <Link
                 href="/achievements"
-                className={`text-xs ${pathname.startsWith("/achievements") ? "font-bold text-[#496612] dark:text-[#d3f36b]" : "text-zinc-500"}`}
+                className={`sidebar-sub-link ${pathname.startsWith("/achievements") ? "active" : ""}`}
               >
+                <span className="sidebar-sub-dot" />
                 <span>Achievements</span>
               </Link>
               <Link
                 href="/work-logs"
-                className={`text-xs ${pathname.startsWith("/work-logs") ? "font-bold text-[#496612] dark:text-[#d3f36b]" : "text-zinc-500"}`}
+                className={`sidebar-sub-link ${pathname.startsWith("/work-logs") ? "active" : ""}`}
               >
+                <span className="sidebar-sub-dot" />
                 <span>Work Logs</span>
               </Link>
             </div>
           )}
 
-          {/* Primary Section 2: Workspace */}
+          {/* Primary Section 3: Workspace */}
           <Link
             href="/workspace"
-            className={isWorkspaceActive ? "active" : ""}
+            className={`sidebar-nav-link ${isWorkspaceActive ? "active" : ""}`}
             title="Workspace: Documents, Reports, Projects, Folders"
           >
-            <Icon name="briefcase" />
+            <Icon name="briefcase" size={18} />
             <span>Workspace</span>
           </Link>
 
           {isWorkspaceActive && (
-            <div className="ml-5 flex flex-col gap-1 border-l-2 border-[#b8e85e]/40 pl-2">
+            <div className="sidebar-subnav">
               <Link
                 href="/workspace"
-                className={`text-xs ${pathname === "/workspace" ? "font-bold text-[#496612] dark:text-[#d3f36b]" : "text-zinc-500"}`}
+                className={`sidebar-sub-link ${pathname === "/workspace" ? "active" : ""}`}
               >
+                <span className="sidebar-sub-dot" />
                 <span>Overview & Docs</span>
               </Link>
               <Link
                 href="/projects"
-                className={`text-xs ${pathname.startsWith("/projects") ? "font-bold text-[#496612] dark:text-[#d3f36b]" : "text-zinc-500"}`}
+                className={`sidebar-sub-link ${pathname.startsWith("/projects") ? "active" : ""}`}
               >
+                <span className="sidebar-sub-dot" />
                 <span>Projects</span>
               </Link>
             </div>
           )}
 
-          {/* Primary Section 3: Insights */}
+          {/* Primary Section 4: Insights */}
           <Link
             href="/insights"
-            className={isInsightsActive ? "active" : ""}
+            className={`sidebar-nav-link ${isInsightsActive ? "active" : ""}`}
             title="Insights: Actual data analytics & summary generator"
           >
-            <Icon name="chart" />
+            <Icon name="chart" size={18} />
             <span>Insights</span>
           </Link>
         </nav>
 
         <div className="sidebar-foot">
-          <span>Small steps add up.</span>
-          <Link href="/profile" className={pathname === "/profile" ? "active" : ""}>
-            <Icon name="settings" />
-            <span>Profile</span>
+          {/* Desktop Rich Profile Card */}
+          <Link
+            href="/profile"
+            className={`sidebar-profile-card ${pathname === "/profile" ? "active" : ""}`}
+            title="View Profile and Account Settings"
+          >
+            <div className="sidebar-profile-avatar">{userInitial}</div>
+            <div className="sidebar-profile-meta">
+              <span className="sidebar-profile-name">{userName}</span>
+              <span className="sidebar-profile-sub">{userSubtitle}</span>
+            </div>
+            <Icon name="settings" size={15} className="sidebar-profile-icon" />
           </Link>
+
           <button
             type="button"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="sidebar-foot-item"
           >
-            <Icon name={theme === "light" ? "moon" : "sun"} />
+            <Icon name={theme === "light" ? "moon" : "sun"} size={17} />
             <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
           </button>
         </div>

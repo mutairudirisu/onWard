@@ -139,7 +139,7 @@ export function CreationSpeedDial() {
     : "Personal";
 
   return (
-    <div className="fixed bottom-[14px] right-[17px] z-40 flex flex-col items-end">
+    <div className="fixed bottom-[17px] right-[16px] z-40 flex flex-col items-end">
       {/* Backdrop overlay when speed dial is open */}
       {open && (
         <div
@@ -209,7 +209,7 @@ export function CreationSpeedDial() {
         onClick={() => setOpen(!open)}
         aria-label={open ? "Close create menu" : "Open create menu"}
         aria-expanded={open}
-        className={`relative z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all duration-200 active:scale-95 ${
+        className={`relative z-40 flex h-[58px] w-[58px] items-center justify-center rounded-full shadow-xl transition-all duration-200 active:scale-95 ${
           open
             ? "border border-white/20 bg-[#1c1c1e] text-white hover:bg-[#2c2c2e]"
             : "bg-[#d3f36b] text-[#283618] shadow-[#718d3744] hover:brightness-105"

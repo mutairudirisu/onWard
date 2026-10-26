@@ -140,15 +140,13 @@ export default function InsightsPage() {
       </header>
 
       {/* Primary Section Filter: Personal vs. Workspace */}
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="insights-segment-track">
           <button
             type="button"
             onClick={() => setInsightSection("personal")}
-            className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition ${
-              insightSection === "personal"
-                ? "bg-[#d3f36b] text-[#283618] shadow-sm"
-                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className={`insights-segment-btn ${
+              insightSection === "personal" ? "active-lime" : ""
             }`}
           >
             <Icon name="user" size={14} />
@@ -157,10 +155,8 @@ export default function InsightsPage() {
           <button
             type="button"
             onClick={() => setInsightSection("workspace")}
-            className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition ${
-              insightSection === "workspace"
-                ? "bg-[#d3f36b] text-[#283618] shadow-sm"
-                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className={`insights-segment-btn ${
+              insightSection === "workspace" ? "active-lime" : ""
             }`}
           >
             <Icon name="briefcase" size={14} />
@@ -169,16 +165,14 @@ export default function InsightsPage() {
         </div>
 
         {/* Date Period Filter */}
-        <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-white p-1 text-xs font-bold dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="insights-segment-track">
           {(["Week", "Month", "Year"] as Range[]).map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => setRange(item)}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                range === item
-                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className={`insights-segment-btn ${
+                range === item ? "active" : ""
               }`}
             >
               {item}

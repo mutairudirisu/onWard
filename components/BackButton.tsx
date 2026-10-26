@@ -27,7 +27,7 @@ export function BackButton({
     <Link
       href={href}
       onClick={handleBack}
-      className={`inline-flex items-center gap-1.5 rounded-xl text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 active:scale-95 ${
+      className={`subpage-back-btn inline-flex items-center gap-1.5 rounded-xl text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 active:scale-95 ${
         label ? "px-2.5 py-1.5 text-xs font-bold" : "h-9 w-9 justify-center -ml-1.5"
       } ${className}`}
       aria-label={label || "Go back"}

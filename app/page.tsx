@@ -285,7 +285,7 @@ function Calendar({
             }
             aria-label="Previous period"
           >
-            <Icon name="chevron" />
+            <Icon name="chevronLeft" />
           </button>
           <button
             type="button"
@@ -295,7 +295,6 @@ function Calendar({
                 : moveWeek(1)
             }
             aria-label="Next period"
-            className="next"
           >
             <Icon name="chevron" />
           </button>
