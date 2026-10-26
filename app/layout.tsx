@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { TaskProvider } from "@/lib/task-context";
+import { WorkspaceProvider } from "@/lib/workspace-context";
+import { Navigation } from "@/components/Navigation";
+import { CreationSpeedDial } from "@/components/CreationSpeedDial";
+import { ModalManager } from "@/components/ModalManager";
 
 export const metadata: Metadata = {
   title: "onWard | A little progress, every day",
@@ -14,8 +19,21 @@ export const viewport: Viewport = { themeColor: "#ffffff", colorScheme: "light d
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <TaskProvider>
+          <WorkspaceProvider>
+            <main className="app">
+              <Navigation />
+              <section className="workspace">
+                {children}
+              </section>
+              <CreationSpeedDial />
+              <ModalManager />
+            </main>
+          </WorkspaceProvider>
+        </TaskProvider>
+      </body>
     </html>
   );
 }

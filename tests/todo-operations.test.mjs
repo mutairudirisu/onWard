@@ -57,3 +57,21 @@ test("saveTodo, removeTodo, and saveTodoOrder surface failures", async () => {
   await assert.rejects(() => removeTodo(failedDelete, todo.id), /delete failed/);
   assert.deepEqual(await saveTodoOrder(orderClient, [{ ...todo, position: 1 }]), [{ ...todo, position: 1 }]);
 });
+
+test("saveTodo persists tasks with reminder information and expired status", async () => {
+  let saved;
+  const taskWithReminder = {
+    ...todo,
+    id: "reminder-task-1",
+    title: "Salatul Duha",
+    plan_type: "task",
+    details: "07:45 am Expired",
+    category: "Personal"
+  };
+  const client = { from: () => ({ upsert: (value) => { saved = value; return { select: () => ({ single: () => Promise.resolve({ data: value, error: null }) }) }; } }) };
+  const res = await saveTodo(client, taskWithReminder);
+  assert.equal(res.title, "Salatul Duha");
+  assert.equal(res.details, "07:45 am Expired");
+  assert.deepEqual(saved, taskWithReminder);
+});
+
