@@ -1,55 +1,84 @@
-# onWard
+# onWard Monorepo
 
-A small, friendly to-do app built with Next.js, Tailwind CSS, and Supabase. Add todos, check them off, filter by list, search, and drag cards to change their order.
+Welcome to the **onWard** monorepo by GIGS Labs.
 
-## Start the app
+This repository is structured into two core Next.js projects:
+- **`frontend/`**: The core onWard productivity, journey planning, clock reminder, and workspace studio web application.
+- **`website/`**: The public product marketing and advertising website showcasing onWard's features, pricing, and capabilities.
 
-1. Install [Node.js](https://nodejs.org/) if it is not already on your computer.
-2. Open this project folder in VS Code.
-3. Open **Terminal → New Terminal**.
-4. Run `npm install` once to install the app's packages.
-5. Run `npm run dev` to start the app.
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+---
 
-The first time, the sample todos save only in this browser. You can try the app without making a Supabase account.
+## Repository Structure
 
-## Turn on Supabase sync
+```text
+OnWard-Todo/
+├── frontend/               # onWard Core Web Application (Next.js 15 App Router)
+│   ├── app/                # Application routes: journey, tasks, notes, workspace, insights
+│   ├── components/         # Workspace studio, clock picker, modals, cards
+│   ├── lib/                # Task & workspace state contexts, Supabase operations
+│   ├── public/             # PWA service worker, icons, web manifest
+│   ├── supabase/           # Database schema and RLS policies
+│   ├── tests/              # Node unit test suite
+│   └── package.json        # Frontend configuration and scripts
+├── website/                # Product Marketing Website (Next.js 15 App Router)
+│   ├── app/                # Landing page layout, globals, hero, interactive tour
+│   ├── components/         # Navbar, Hero, FeatureGrid, InteractiveShowcase, Pricing, FAQ
+│   └── package.json        # Website configuration (dev port 3001)
+├── package.json            # Root npm workspaces configuration
+├── AGENTS.md               # Agent and database change instructions
+└── README.md               # Monorepo documentation
+```
 
-1. Create a free project at [supabase.com](https://supabase.com/).
-2. In your Supabase project, open **SQL Editor → New query**, copy in [`supabase/schema.sql`](supabase/schema.sql), and run it. This creates the `todos` table. If your database already has a `tasks` table from an earlier version, the script renames it and keeps its rows.
-3. Open your project's **Project Settings → API** (or **Connect**) page and copy the project URL and publishable/anon key.
-4. Make a copy of `.env.example` named `.env.local` in the project folder.
-5. Replace the example values in `.env.local` with the URL and key from Supabase:
+---
 
-   ```text
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-key
-   ```
+## Quick Start
 
-6. Stop the running app with **Ctrl+C** in the terminal, then run `npm run dev` again.
+### 1. Run the Frontend App (Port 3000)
 
-7. In **Authentication → URL Configuration**, add `http://localhost:3000` to the redirect URL allow-list. Add your deployed app URL there too when you publish it.
-8. In **Authentication → Providers → Email**, enable email/password sign-in. New accounts use a six-digit confirmation code when email confirmation is enabled; see the note below for the required email template setting.
+```bash
+# From repository root
+npm run dev:frontend
 
-## Notifications and voice input
+# Or directly in frontend
+cd frontend
+npm run dev
+```
 
-- The Profile page can request browser notification permission. It registers the included service worker, which displays incoming Web Push messages.
-- To create a push subscription, add a VAPID public key as `NEXT_PUBLIC_VAPID_PUBLIC_KEY` in `.env.local`. A notification service or server endpoint must receive the resulting subscription and send the messages; the browser app stores a local copy for development.
-- The microphone button in plan and task title fields uses the browser's Web Speech API. It works in browsers that provide speech recognition and remains optional—typing always works.
+Open [http://localhost:3000](http://localhost:3000) to open the onWard application.
 
-The green dot at the top means the app sees your Supabase settings. Without settings, it automatically saves todos in your browser instead. Todos made in local mode do not automatically move to Supabase.
+### 2. Run the Marketing Website (Port 3001)
 
-> **Privacy note:** The included SQL policies require a signed-in user and restrict every todo to its owner. Never expose a Supabase service-role key in the browser.
+```bash
+# From repository root
+npm run dev:website
 
-## Learn the project
+# Or directly in website
+cd website
+npm run dev
+```
 
-- `app/page.tsx` contains the screen and task actions (add, complete, filter, search, and reorder).
-- `app/globals.css` contains the layout, colors, and responsive styles. The color variables are near the top.
-- `lib/supabase.ts` connects to Supabase only after you add the two settings.
-- `supabase/schema.sql` creates the database table.
+Open [http://localhost:3001](http://localhost:3001) to view the marketing landing page.
 
-Made for steady little steps. onWard.
+---
 
-## Email and password sign-in
+## Development & Testing Scripts
 
-The app uses Supabase email/password authentication. In Supabase, enable email/password sign-in under Authentication providers. For the in-app six-digit confirmation screen, update the **Confirm signup** email template to include `{{ .Token }}`; otherwise Supabase's normal confirmation link remains the alternative verification path.
+From the repository root:
+- **`npm run test:frontend`**: Run the automated test suite (PWA, themes, database operations).
+- **`npm run lint:frontend`**: Run ESLint across the frontend application.
+- **`npm run lint:website`**: Run ESLint across the marketing website.
+- **`npm run build:frontend`**: Build the optimized frontend Next.js production bundle.
+- **`npm run build:website`**: Build the optimized marketing website Next.js production bundle.
+
+---
+
+## Features
+
+- **Daily Focus & Calendar**: Dynamic week-strip and full month planner.
+- **Targeted Clock Reminders**: 12-hour AM/PM dials with context notes and alarms.
+- **Workspace Folders**: Drag-and-drop document grouping with permission controls.
+- **Word (.doc) & PDF Studio**: Styled corporate tables and 1-click downloads.
+- **Verified Milestones**: Proof of work compiler with 1-click LinkedIn and X publishing.
+- **PWA & Offline Ready**: Service worker caching and Supabase synchronization.
+
+A little progress, everyday 🌱

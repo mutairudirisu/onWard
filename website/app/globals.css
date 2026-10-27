@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Manrope:wght@500;600;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --ink: #1a1e1b;
+  --muted: #6f7771;
+  --paper: #ffffff;
+  --surface: #f9fbf8;
+  --soft: #f0f4ec;
+  --line: #e3e8de;
+  --lime: #d3f36b;
+  --lime-dark: #85a900;
+  --lime-ink: #283618;
+  --charcoal: #1c221e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Manrope', sans-serif;
+  letter-spacing: -0.035em;
+}
+
+/* Glassmorphism nav & card utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(227, 232, 222, 0.8);
+}
+
+.glow-lime {
+  box-shadow: 0 12px 36px rgba(184, 245, 0, 0.22);
+}
+
+.glow-subtle {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.04);
+}
+

@@ -1,6 +1,27 @@
+# Dependencies
 node_modules/
+**/node_modules/
+
+# Next.js build output
 .next/
+**/.next/
+out/
+**/out/
+
+# Build caches
 *.tsbuildinfo
+**/*.tsbuildinfo
+
+# Environment files
 .env*
+**/.env*
 !.env.example
+!**/.env.example
+
+# Next.js generated types
 next-env.d.ts
+**/next-env.d.ts
+
+# OS files
+.DS_Store
+Thumbs.db
