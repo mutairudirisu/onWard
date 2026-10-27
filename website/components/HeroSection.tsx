@@ -13,9 +13,9 @@ export function HeroSection() {
         <div className="flex justify-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#85a900]/30 bg-[#f4ffe0] px-4 py-1.5 text-xs font-bold text-[#354516] shadow-xs">
             <span className="flex h-2 w-2 rounded-full bg-[#85a900] animate-pulse" />
-            <span>onWard 2.0 Released</span>
+            <span>Personal Productivity Meets Workspace Management</span>
             <span className="text-[#85a900]">·</span>
-            <span className="text-zinc-600 font-medium">Word & PDF Studio, Clock Reminders & Monorepo</span>
+            <span className="text-zinc-600 font-medium">Tasks, Notes, Achievements, Work Logs & Projects</span>
           </div>
         </div>
 
@@ -29,8 +29,8 @@ export function HeroSection() {
             </span>
             .
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base sm:text-xl font-normal text-[#5a625d] leading-relaxed">
-            The calm, high-velocity productivity hub for ambitious builders. Plan daily focus, manage rich documents with native Word & PDF export, and compile daily wins into verified career milestones.
+          <p className="mx-auto mt-6 max-w-3xl text-base sm:text-xl font-normal text-[#5a625d] leading-relaxed">
+            onWard connects your personal productivity with professional work management in one calm, unified place. Organize your daily tasks, capture ideas in notes with mind maps, celebrate personal achievements, document work logs, and manage team projects with clarity.
           </p>
 
           {/* CTA Buttons */}
@@ -47,13 +47,13 @@ export function HeroSection() {
             </a>
 
             <Link
-              href="#workspace"
+              href="#how-it-works"
               className="flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-6 text-sm font-bold text-zinc-700 transition hover:bg-zinc-50 hover:border-zinc-300"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
-              <span>Explore Workspace Tour</span>
+              <span>Explore The System</span>
             </Link>
           </div>
 
@@ -63,13 +63,13 @@ export function HeroSection() {
               <span className="text-[#85a900]">✓</span> 100% Offline-capable PWA
             </span>
             <span className="flex items-center gap-1.5">
+              <span className="text-[#85a900]">✓</span> Notes with Mind Maps & Sketches
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-[#85a900]">✓</span> Daily Work Logs & Milestones
+            </span>
+            <span className="flex items-center gap-1.5">
               <span className="text-[#85a900]">✓</span> Word (.doc) & PDF Export
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-[#85a900]">✓</span> 1-Click LinkedIn Milestone Publisher
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-[#85a900]">✓</span> Secure Supabase Sync
             </span>
           </div>
         </div>
@@ -83,11 +83,11 @@ export function HeroSection() {
                 <span className="h-3 w-3 rounded-full bg-rose-400" />
                 <span className="h-3 w-3 rounded-full bg-amber-400" />
                 <span className="h-3 w-3 rounded-full bg-emerald-400" />
-                <span className="ml-2 text-xs font-bold text-zinc-400">onWard Productivity Hub</span>
+                <span className="ml-2 text-xs font-bold text-zinc-400">onWard · Connected Productivity Platform</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-[#f4ffe0] px-2.5 py-1 text-[11px] font-bold text-[#354516]">
-                  ● Active Workspace: OnWard Engineering
+                  ● Live Workspace & Personal Hub
                 </span>
               </div>
             </div>
@@ -99,7 +99,7 @@ export function HeroSection() {
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#85a900] uppercase tracking-wider">
-                      Daily Focus & Reminders
+                      Tasks & Reminders
                     </span>
                     <span className="rounded-full bg-[#edf6d5] px-2 py-0.5 text-[10px] font-extrabold text-[#3d4b24]">
                       08:30 AM
@@ -118,52 +118,52 @@ export function HeroSection() {
                 </div>
               </div>
 
-              {/* Pillar 2: Workspace Folders & Document Studio */}
+              {/* Pillar 2: Personal Notes & Mind Maps */}
+              <div className="rounded-xl border border-zinc-200/80 bg-[#fbfdf9] p-4.5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
+                      Notes & Ideas
+                    </span>
+                    <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-extrabold text-amber-800">
+                      Mind Map Ready
+                    </span>
+                  </div>
+                  <h3 className="mt-2 text-base font-bold text-zinc-900">
+                    Sprint Retrospective & Ideas
+                  </h3>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Capture thoughts, create mind maps, record audio notes, and draw sketches.
+                  </p>
+                </div>
+                <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-xs">
+                  <span className="font-semibold text-zinc-600">🌱 Mind Map Outlined</span>
+                  <span className="text-zinc-400">Autosaved</span>
+                </div>
+              </div>
+
+              {/* Pillar 3: Work Logs, Milestones & Projects */}
               <div className="rounded-xl border border-zinc-200/80 bg-[#fbfdf9] p-4.5 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">
-                      Workspace Studio
+                      Work Logs & Projects
                     </span>
                     <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold text-blue-700">
-                      Word + PDF
+                      Verified Win
                     </span>
                   </div>
                   <h3 className="mt-2 text-base font-bold text-zinc-900">
-                    Architecture & User Journeys
+                    Documented 45% Latency Win
                   </h3>
                   <p className="mt-1 text-xs text-zinc-500">
-                    Styled tables with onWard Lime theme, revision history, and Word export.
+                    Outcomes logged, lessons learned captured, and project status updated.
                   </p>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-xs">
-                  <span className="font-semibold text-zinc-600">📁 Sprint Planning</span>
-                  <span className="text-zinc-400">4 Collaborators</span>
-                </div>
-              </div>
-
-              {/* Pillar 3: Verified Milestones & LinkedIn Compiler */}
-              <div className="rounded-xl border border-zinc-200/80 bg-[#fbfdf9] p-4.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">
-                      Proof of Work
-                    </span>
-                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700">
-                      1-Click Share
-                    </span>
-                  </div>
-                  <h3 className="mt-2 text-base font-bold text-zinc-900">
-                    45% API Latency Optimization
-                  </h3>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Compiled directly into professional performance appraisal & LinkedIn posts.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-xs">
-                  <span className="font-bold text-zinc-700">#SoftwareEngineering</span>
+                  <span className="font-bold text-zinc-700">📁 Client Deliverables</span>
                   <span className="rounded bg-[#d3f36b] px-2 py-0.5 text-[10px] font-bold text-[#283618]">
-                    Shared ✓
+                    Milestone ✓
                   </span>
                 </div>
               </div>

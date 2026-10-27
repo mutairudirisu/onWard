@@ -89,7 +89,6 @@ export function AppShowcase() {
                     {/* Brand */}
                     <div className="flex items-baseline gap-1 font-heading text-lg font-extrabold tracking-tight text-zinc-900">
                       <span className="text-[#85a900]">o</span>nWard
-                      <span className="text-[7px] text-zinc-400 uppercase font-bold tracking-widest ml-1">by GIGS</span>
                     </div>
                     <p className="mt-1 text-[10px] text-zinc-500 font-medium">
                       A little progress, <span className="text-[#85a900] font-bold">every day</span>
@@ -103,23 +102,23 @@ export function AppShowcase() {
                       </div>
                       <div className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-semibold text-zinc-600 hover:bg-zinc-100">
                         <span>✓</span>
-                        <span>Tasks & Clock</span>
+                        <span>Tasks & Reminders</span>
                       </div>
                       <div className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-semibold text-zinc-600 hover:bg-zinc-100">
                         <span>📝</span>
-                        <span>Personal Notes</span>
-                      </div>
-                      <div className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-semibold text-zinc-600 hover:bg-zinc-100">
-                        <span>📁</span>
-                        <span>Workspace Studio</span>
+                        <span>Notes & Mind Maps</span>
                       </div>
                       <div className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-semibold text-zinc-600 hover:bg-zinc-100">
                         <span>🏆</span>
-                        <span>Achievements</span>
+                        <span>Achievements & Wins</span>
                       </div>
                       <div className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-semibold text-zinc-600 hover:bg-zinc-100">
-                        <span>📊</span>
-                        <span>Insights & Proof</span>
+                        <span>📋</span>
+                        <span>Daily Work Logs</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-semibold text-zinc-600 hover:bg-zinc-100">
+                        <span>📁</span>
+                        <span>Projects & Workspace</span>
                       </div>
                     </div>
                   </div>
@@ -146,7 +145,7 @@ export function AppShowcase() {
                           Today&apos;s Journey
                         </h2>
                         <p className="text-xs text-zinc-500 mt-0.5">
-                          3 high-impact tasks scheduled · 2 verified receipts logged
+                          3 high-impact tasks scheduled · 2 daily work logs documented
                         </p>
                       </div>
                       <span className="rounded-xl bg-[#d3f36b] px-3 py-1.5 text-xs font-bold text-[#283618]">
@@ -197,7 +196,7 @@ export function AppShowcase() {
                           </div>
                         </div>
                         <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">
-                          Receipt Logged
+                          Completed ✓
                         </span>
                       </div>
 

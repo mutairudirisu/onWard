@@ -12,26 +12,25 @@ export function MarketingNavbar() {
     <header className="sticky top-0 z-50 w-full border-b border-[#e3e8de]/80 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 sm:px-8">
         {/* Brand */}
-        <Link href="/" className="flex items-baseline gap-1.5 text-decoration-none group">
+        <Link href="/" className="flex items-center gap-2 text-decoration-none group">
           <span className="font-heading text-2xl font-extrabold tracking-tighter text-[#1c221e]">
             <span className="text-[#85a900] group-hover:text-[#a0cc00] transition-colors">o</span>nWard
           </span>
-          <span className="flex flex-col text-[8.5px] font-bold tracking-tight text-[#808784] leading-tight">
-            <span className="text-[7.5px] font-medium">by</span>
-            <span>GIGS Labs</span>
+          <span className="hidden sm:inline-block rounded-full bg-[#f4ffe0] px-2.5 py-0.5 text-[10px] font-bold text-[#354516] border border-[#85a900]/20">
+            A little progress, every day
           </span>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#5a625d]">
+        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-[#5a625d]">
           <Link href="#features" className="transition-colors hover:text-[#1c221e]">
             Features
           </Link>
-          <Link href="#workspace" className="transition-colors hover:text-[#1c221e]">
-            Workspace Studio
+          <Link href="#how-it-works" className="transition-colors hover:text-[#1c221e]">
+            How It Works
           </Link>
-          <Link href="#milestones" className="transition-colors hover:text-[#1c221e]">
-            Milestones
+          <Link href="#workspace" className="transition-colors hover:text-[#1c221e]">
+            Interactive Tour
           </Link>
           <Link href="#pricing" className="transition-colors hover:text-[#1c221e]">
             Pricing
@@ -95,18 +94,18 @@ export function MarketingNavbar() {
               Features
             </Link>
             <Link
+              href="#how-it-works"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-1 hover:text-[#85a900]"
+            >
+              How It Works
+            </Link>
+            <Link
               href="#workspace"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1 hover:text-[#85a900]"
             >
-              Workspace Studio
-            </Link>
-            <Link
-              href="#milestones"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1 hover:text-[#85a900]"
-            >
-              Milestones
+              Interactive Tour
             </Link>
             <Link
               href="#pricing"

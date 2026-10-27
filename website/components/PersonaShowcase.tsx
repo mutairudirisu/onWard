@@ -22,7 +22,7 @@ export function PersonaShowcase() {
       tab: "For Engineers",
       title: "Software Engineers & Architects",
       description:
-        "Document performance breakthroughs, ship modular systems, track latency wins, and compile technical receipts ready for promotion appraisals.",
+        "Document performance breakthroughs, ship modular systems, maintain structured daily work logs, and compile achievements ready for promotion appraisals.",
       cardBadge: "Engineering Velocity",
       metrics: [
         { label: "API Latency Optimization", value: "Sub-100ms", status: "Shipped ✓" },
@@ -53,7 +53,7 @@ export function PersonaShowcase() {
       metrics: [
         { label: "Daily Shipping Streak", value: "24 Days", status: "Active 🔥" },
         { label: "Product Marketing Site Launch", value: "Complete", status: "Live ✓" },
-        { label: "Time Capsule Deliverables", value: "6 Months", status: "Scheduled ⏱️" },
+        { label: "Quarterly Milestone Goals", value: "8 Completed", status: "Achieved ✓" },
       ],
       tags: ["Bootstrapping", "Growth", "Marketing", "Execution", "Daily Habits"],
     },

@@ -2,27 +2,30 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "onWard | A little progress, every day",
+  title: "onWard | Personal Productivity & Professional Workspace",
   description:
-    "The calm, high-performance productivity workspace that tracks your daily journey, powers rich document workspaces, and turns everyday wins into verified professional milestones.",
+    "onWard connects personal productivity with professional work management in one calm place. Organize daily tasks with clock reminders, capture notes with mind maps, celebrate achievements, document work logs, and manage team projects.",
   applicationName: "onWard",
   keywords: [
     "productivity",
-    "todo app",
+    "tasks",
+    "notes",
+    "mind map",
+    "achievements",
+    "work logs",
+    "projects",
     "workspace",
     "word export",
-    "milestone tracker",
-    "daily journey",
-    "career growth",
+    "personal growth",
   ],
-  authors: [{ name: "GIGS Labs" }],
+  authors: [{ name: "onWard" }],
   icons: {
     icon: "/icon.svg",
   },
   openGraph: {
     title: "onWard — A little progress, every day",
     description:
-      "Transform your daily focus into career momentum with clock reminders, document studios, and one-click achievement sharing.",
+      "Connect your personal productivity with professional work management in one calm, unified workspace.",
     type: "website",
   },
 };

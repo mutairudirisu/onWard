@@ -35,80 +35,90 @@ export function MarketingFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 border-b border-white/10 pb-12">
           {/* Brand info */}
           <div className="space-y-4 md:col-span-1">
-            <Link href="/" className="flex items-baseline gap-1.5 text-decoration-none group">
+            <Link href="/" className="flex items-center gap-2 text-decoration-none group">
               <span className="font-heading text-2xl font-extrabold tracking-tighter text-white">
                 <span className="text-[#d3f36b]">o</span>nWard
               </span>
-              <span className="flex flex-col text-[8.5px] font-bold tracking-tight text-zinc-400 leading-tight">
-                <span className="text-[7.5px] font-medium">by</span>
-                <span>GIGS Labs</span>
-              </span>
             </Link>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              A little progress, everyday. Designed for builders who value calm focus and tangible career momentum.
+              A personal productivity and workspace application that connects daily task planning, notes, achievements, work logs, and collaborative projects in one calm place.
+            </p>
+            <p className="text-[11px] font-semibold text-[#d3f36b]">
+              A little progress, every day.
             </p>
           </div>
 
-          {/* Column 1: Product */}
+          {/* Column 1: Personal Productivity */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Product</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Personal Productivity</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
               <li>
                 <Link href="#features" className="hover:text-white transition">
-                  Daily Journey & Calendar
+                  Daily Tasks & 12h Alarms
                 </Link>
               </li>
               <li>
                 <Link href="#workspace" className="hover:text-white transition">
-                  Word & PDF Studio
+                  Notes & Mind Map Studio
                 </Link>
               </li>
               <li>
-                <Link href="#milestones" className="hover:text-white transition">
-                  Clock Reminders
+                <Link href="#how-it-works" className="hover:text-white transition">
+                  Achievements & Milestones
                 </Link>
+              </li>
+              <li>
+                <Link href="#features" className="hover:text-white transition">
+                  Expandable Calendar Strip
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 2: Workspace & Professional */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Workspace Management</h4>
+            <ul className="space-y-2 text-xs text-zinc-400">
+              <li>
+                <Link href="#how-it-works" className="hover:text-white transition">
+                  Daily Work Logs
+                </Link>
+              </li>
+              <li>
+                <Link href="#features" className="hover:text-white transition">
+                  Projects & Team Invites
+                </Link>
+              </li>
+              <li>
+                <Link href="#workspace" className="hover:text-white transition">
+                  Word (.doc) & PDF Studio
+                </Link>
+              </li>
+              <li>
+                <Link href="#workspace" className="hover:text-white transition">
+                  Workspace Drag-and-Drop Folders
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Platform & Trust */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Platform</h4>
+            <ul className="space-y-2 text-xs text-zinc-400">
+              <li>
+                <span className="text-zinc-400">100% Offline-Capable PWA</span>
+              </li>
+              <li>
+                <span className="text-zinc-400">Supabase Cloud Sync</span>
+              </li>
+              <li>
+                <span className="text-zinc-400">Row-Level Security (RLS)</span>
               </li>
               <li>
                 <Link href="#pricing" className="hover:text-white transition">
-                  Milestone to LinkedIn
+                  Transparent Naira (₦) Pricing
                 </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 2: Ecosystem */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Ecosystem</h4>
-            <ul className="space-y-2 text-xs text-zinc-400">
-              <li>
-                <a href={APP_URL} className="hover:text-white transition">
-                  Web Application
-                </a>
-              </li>
-              <li>
-                <span className="text-zinc-500">iOS & Android PWA</span>
-              </li>
-              <li>
-                <span className="text-zinc-500">Supabase Cloud Sync</span>
-              </li>
-              <li>
-                <span className="text-zinc-500">MS Word (.doc) Exporter</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: GIGS Labs */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Company</h4>
-            <ul className="space-y-2 text-xs text-zinc-400">
-              <li>
-                <span className="text-zinc-400">GIGS Labs Innovations</span>
-              </li>
-              <li>
-                <span className="text-zinc-400">Security & Privacy First</span>
-              </li>
-              <li>
-                <span className="text-zinc-400">Open API & Extensibility</span>
               </li>
             </ul>
           </div>
@@ -116,7 +126,7 @@ export function MarketingFooter() {
 
         {/* Copyright */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-4">
-          <p>© {new Date().getFullYear()} onWard by GIGS Labs. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} onWard. All rights reserved.</p>
           <div className="flex gap-6">
             <span>Privacy Policy</span>
             <span>Terms of Service</span>
